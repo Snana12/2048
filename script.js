@@ -1,11 +1,21 @@
-const container = document.getElementById('container');
-const registerBtn = document.getElementById('register');
-const loginBtn = document.getElementById('login');
+const wrapper = document.querySelector('.wrapper');
+const loginLink = document.querySelector('.login-link');
+const registerLink = document.querySelector('.register-link');
+const btnPopup = document.querySelector('btnlogin-popup');
+const iconClose = document.querySelector('.icon-close');
 
-registerBtn.addEventListener('click', () => {
-    container.classList.add("active");
+registerLink.addEventListener('click', () => {
+    wrapper.classList.add('active');
 });
 
-loginBtn.addEventListener('click', () => {
-    container.classList.remove("active");
+loginLink.addEventListener('click', () => {
+    wrapper.classList.remove('active');
+});
+
+btnPopup.addEventListener('click', () => {
+    wrapper.classList.add('active-popup');
+});
+
+iconClose.addEventListener('click', () => {
+    wrapper.classList.remove('active-popup');
 });
