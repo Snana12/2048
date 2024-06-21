@@ -6,7 +6,7 @@ const path = require('path');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5501;
 
 const uri = "mongodb+srv://liyanaamri:wonwoo@cluster0.zggp7rq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
