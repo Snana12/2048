@@ -111,6 +111,55 @@ function verifyToken(req, res, next) {
         next();
     });
 }
+// player password reset request
+app.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await client.db("2048_game").collection("users").findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'Email not found' });
+    }
+
+    const resetToken = generateToken({ id: user._id }, '15m');
+    const resetUrl = `http://localhost:${port}/reset-password/${resetToken}`;
+    await transporter.sendMail({
+      from: '"2048 Game Support" <your-email@gmail.com>',
+      to: email,
+      subject: 'Password Reset',
+      html: `<p>Click the link below to reset your password:</p><a href="${resetUrl}">${resetUrl}</a>`,
+    });
+
+    res.status(200).json({ success: true, message: 'Password reset email sent' });
+  } catch (error) {
+    console.error('Error in forgot-password:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
+// Password reset endpoint
+app.post('/reset-password/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+    const decoded = jwt.verify(token, jwtSecret);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const result = await client.db("2048_game").collection("users").updateOne(
+      { _id: new ObjectId(decoded.id) },
+      { $set: { password: hashedPassword } }
+    );
+
+    if (result.modifiedCount === 1) {
+      res.status(200).json({ success: true, message: 'Password reset successful' });
+    } else {
+      res.status(400).json({ success: false, message: 'Invalid or expired reset link' });
+    }
+  } catch (error) {
+    console.error('Error in reset-password:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
 
 // Middleware to verify admin access
 function verifyAdmin(req, res, next) {
